@@ -442,12 +442,6 @@ export USE_LOCAL_EMBEDDINGS=true
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📧 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-org/rag-app/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/rag-app/discussions)
-- **Email**: support@rag-app.com
-
 ## 🙏 Acknowledgments
 
 - [FastAPI](https://fastapi.tiangolo.com) for the amazing web framework
