@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # Main RAG Application
+  rag-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: rag-app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Application Settings
+      - APP_NAME=${APP_NAME:-RAG Application}
+      - DEBUG=${DEBUG:-false}
+      - HOST=${HOST:-0.0.0.0}
+      - PORT=${PORT:-8000}
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY:-change-this-in-production}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-key}
+      - JWT_EXPIRATION_HOURS=${JWT_EXPIRATION_HOURS:-24}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      
+      # AI Providers (Optional)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - LLM_PROVIDER=${LLM_PROVIDER:-google}
+      
+      # Processing Settings
+      - USE_LOCAL_EMBEDDINGS=${USE_LOCAL_EMBEDDINGS:-true}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-all-MiniLM-L6-v2}
+      - CHUNK_SIZE=${CHUNK_SIZE:-1000}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-200}
+      - TOP_K_RETRIEVAL=${TOP_K_RETRIEVAL:-5}
+    
+    volumes:
+      # Persist logs
+      - ./logs:/app/logs
+      # Persist temporary files (optional)
+      - ./temp_docs:/app/temp_docs
+    
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Development override service
+  rag-app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: rag-app-dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DEBUG=${DEBUG:-true}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - LLM_PROVIDER=${LLM_PROVIDER:-google}
+      - USE_LOCAL_EMBEDDINGS=${USE_LOCAL_EMBEDDINGS:-true}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-all-MiniLM-L6-v2}
+    volumes:
+      # Mount source code for development
+      - ./app:/app/app
+      - ./tests:/app/tests
+      - ./logs:/app/logs
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    profiles:
+      - dev
+    restart: "no"
+
+# Networks
+networks:
+  default:
+    name: rag-network
+    driver: bridge
+
+# Volumes
+volumes:
+  rag-logs:
+    driver: local
+  rag-temp:
+    driver: local 

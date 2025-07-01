@@ -1,0 +1,49 @@
+fastapi[standard]
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+pypdf2
+langchain
+langchain-community
+langchain-openai
+faiss-cpu
+numpy
+sentence-transformers
+torch
+openai
+google-generativeai
+sse-starlette
+
+# Development dependencies
+pytest
+pytest-asyncio
+httpx
+
+# For test PDF creation
+reportlab
+
+# Optional: For better logging
+colorlog
+
+# For enhanced text processing
+tiktoken
+
+# For async HTTP requests
+aiohttp
+
+# LangChain ecosystem
+langchain-core
+langchain-text-splitters
+
+# PDF processing dependencies
+pypdf
+
+# Additional dependencies
+email-validator
+PyJWT
+
+# Authentication
+PyJWT[crypto]
+
+# Optional: Enhanced PDF processing
+pdfplumber
